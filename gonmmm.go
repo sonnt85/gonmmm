@@ -24,13 +24,16 @@ func MMGetGsmIndex() string {
 	return ""
 }
 
-func MMConIsExist(conname string) bool {
+func NMConIsExist(conname string) bool {
 	cmd := fmt.Sprintf(`con show %s`, conname)
 	if _, err := NMRunCommand(cmd); err != nil {
 		return false
 	}
+	return true
+}
 
-	cmd = fmt.Sprintf(`con show`)
+func NMDelCon(conname string) bool {
+	cmd := fmt.Sprintf(`con show %s`, conname)
 	if stdout, err := NMRunCommand(cmd); err != nil {
 		return false
 	} else {
@@ -103,4 +106,16 @@ func NMRunCommand(cmd string, timeouts ...time.Duration) (stdout string, err err
 		err1 = fmt.Errorf("%s", string(stderrb))
 	}
 	return string(stdoutb), err1
+}
+
+func NMUpCon(conname string) error {
+	if !NMConIsExist(conname) {
+		return fmt.Errorf("Connection is not exist")
+	}
+	cmd := fmt.Sprintf(`con up %s`, conname)
+	if _, err := NMRunCommand(cmd); err != nil {
+		return fmt.Errorf("Can not up connection %s", err.Error())
+		//		return err
+	}
+	return nil
 }
