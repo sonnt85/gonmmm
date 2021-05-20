@@ -32,6 +32,18 @@ func NMConIsExist(conname string) bool {
 	return true
 }
 
+func NMConIsActivated(conname string) bool {
+	cmd := fmt.Sprintf(`-f GENERAL.STATE connection show %s`, conname)
+	if stdout, err := NMRunCommand(cmd); err != nil {
+		return false
+	} else {
+		if gogrep.StringIsMatchLine(stdout, " activated", true) {
+			return true
+		}
+	}
+	return false
+}
+
 func NMDelCon(conname string) bool {
 	cmd := fmt.Sprintf(`con show %s`, conname)
 	if stdout, err := NMRunCommand(cmd); err != nil {
