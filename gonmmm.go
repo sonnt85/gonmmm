@@ -33,11 +33,13 @@ func NMConIsExist(conname string) bool {
 }
 
 func NMConIsActivated(conname string) bool {
-	cmd := fmt.Sprintf(`-f GENERAL.STATE connection show %s`, conname)
+	//	cmd := fmt.Sprintf(`-f GENERAL.STATE connection show %s`, conname)
+	cmd := fmt.Sprintf(`con show --active`)
+
 	if stdout, err := NMRunCommand(cmd); err != nil {
 		return false
 	} else {
-		if gogrep.StringIsMatchLine(stdout, " activated", true) {
+		if gogrep.StringIsMatchLine(stdout, conname, true) {
 			return true
 		}
 	}
@@ -120,14 +122,35 @@ func NMRunCommand(cmd string, timeouts ...time.Duration) (stdout string, err err
 	return string(stdoutb), err1
 }
 
-func NMUpCon(conname string) error {
+func NMConGetField(conname, field string) string {
+	if f, err := NMRunCommand(fmt.Sprintf("-s -g %s connection show %s", field, conname)); err == nil {
+		return f
+	} else {
+		return ""
+	}
+}
+
+func NMConModField(conname, field, newval string) error {
+	if _, err := NMRunCommand(fmt.Sprintf("connection modify %s %s %s", conname, field, newval)); err == nil {
+		return nil
+	} else {
+		return err
+	}
+}
+
+func NMEnableCon(conname string) error {
 	if !NMConIsExist(conname) {
 		return fmt.Errorf("Connection is not exist")
 	}
-	cmd := fmt.Sprintf(`con up %s`, conname)
-	if _, err := NMRunCommand(cmd); err != nil {
-		return fmt.Errorf("Can not up connection %s", err.Error())
-		//		return err
+	if !NMConIsActivated(conname) {
+		cmd := fmt.Sprintf(`con up %s`, conname)
+		if _, err := NMRunCommand(cmd); err != nil {
+			return fmt.Errorf("Can not up connection %s", err.Error())
+		}
 	}
 	return nil
+}
+
+func NMUpCon(conname string) error {
+	return NMEnableCon(conname)
 }
