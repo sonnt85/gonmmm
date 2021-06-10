@@ -130,8 +130,12 @@ func NMConGetField(conname, field string) string {
 	}
 }
 
-func NMConModField(conname, field, newval string) error {
-	if _, err := NMRunCommand(fmt.Sprintf("connection modify %s %s %s", conname, field, newval)); err == nil {
+func NMConModField(conname, field, newval string, others ...string) error {
+	other := ""
+	if len(others) != 0 {
+		other = others[0]
+	}
+	if _, err := NMRunCommand(fmt.Sprintf("connection modify %s %s %s %s", conname, field, newval, other)); err == nil {
 		return nil
 	} else {
 		return err
@@ -153,4 +157,41 @@ func NMEnableCon(conname string) error {
 
 func NMUpCon(conname string) error {
 	return NMEnableCon(conname)
+}
+
+func NMCreateConnection(conname, ifacename, contype string, others ...string) error {
+	other := ""
+	if len(others) != 0 {
+		other = others[0]
+	}
+	//connection.autoconnect
+	if NMConIsExist(conname) {
+		oldIface := NMConGetField(conname, "connection.interface-name")
+		oldContype := NMConGetField(conname, "connection.type")
+
+		if oldIface != ifacename {
+			if err := NMConModField(conname, "connection.interface-name", ifacename); err != nil {
+				return err
+			}
+		}
+
+		if !strings.Contains(oldContype, contype) {
+			if err := NMConModField(conname, "connection.type", contype); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	cmd := fmt.Sprintf(`connection add type %s ifname "%s" con-name %s %s`, contype, ifacename, conname, other)
+	_, err := NMRunCommand(cmd)
+	return err
+}
+
+func NMDisableDev(dev string) {
+	NMRunCommand("device disconnect " + dev)
+}
+
+func NMEnableDev(dev string) {
+	NMRunCommand("device connect " + dev)
 }
