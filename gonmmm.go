@@ -10,6 +10,7 @@ import (
 	"github.com/sonnt85/gosutils/shellwords"
 	"github.com/sonnt85/gosutils/sregexp"
 	"github.com/sonnt85/gosutils/sutils"
+	"github.com/sonnt85/gosystem"
 )
 
 func MMGetGsmIndex() string {
@@ -155,6 +156,19 @@ func NMEnableCon(conname string) error {
 	return nil
 }
 
+func NMDisableCon(conname string) error {
+	if !NMConIsExist(conname) {
+		return nil
+	}
+	if NMConIsActivated(conname) {
+		cmd := fmt.Sprintf(`con down %s`, conname)
+		if _, err := NMRunCommand(cmd); err != nil {
+			return fmt.Errorf("Can not down connection %s", err.Error())
+		}
+	}
+	return nil
+}
+
 func NMUpCon(conname string) error {
 	return NMEnableCon(conname)
 }
@@ -189,9 +203,13 @@ func NMCreateConnection(conname, ifacename, contype string, others ...string) er
 }
 
 func NMDisableDev(dev string) {
-	NMRunCommand("device disconnect " + dev)
+	NMRunCommand(fmt.Sprintf("device set %s  managed no", dev))
 }
 
 func NMEnableDev(dev string) {
-	NMRunCommand("device connect " + dev)
+	NMRunCommand(fmt.Sprintf("device set %s  managed yes", dev))
+}
+
+func NMRestartMM() {
+	gosystem.RestartApp("network-manager")
 }
