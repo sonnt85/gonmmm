@@ -211,5 +211,13 @@ func NMEnableDev(dev string) {
 }
 
 func NMRestartMM() {
-	gosystem.RestartApp("network-manager")
+	gosystem.RestartApp("ModemManager")
+}
+
+func NMDevGetCon(ifacename string) string {
+	if con, err := NMRunCommand(fmt.Sprintf("-s -g GENERAL.CONNECTION device show  %s", ifacename)); err == nil {
+		return sutils.StringTrimLeftRightNewlineSpace(con)
+	} else {
+		return ""
+	}
 }
