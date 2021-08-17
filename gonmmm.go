@@ -131,12 +131,21 @@ func NMConGetField(conname, field string) string {
 	}
 }
 
+func NMConEditFieldIfChange(conname, field, newValue string) bool {
+	if NMConGetField(conname, field) != newValue {
+		if nil != NMConModField(conname, field, newValue) {
+			return false
+		}
+	}
+	return true
+}
+
 func NMConModField(conname, field, newval string, others ...string) error {
 	other := ""
 	if len(others) != 0 {
 		other = others[0]
 	}
-	if _, err := NMRunCommand(fmt.Sprintf("connection modify %s %s %s %s", conname, field, newval, other)); err == nil {
+	if _, err := NMRunCommand(fmt.Sprintf(`connection modify %s %s "%s" %s`, conname, field, newval, other)); err == nil {
 		return nil
 	} else {
 		return err
@@ -203,7 +212,7 @@ func NMCreateConnection(conname, ifacename, contype string, others ...string) er
 }
 
 func NMDisableDev(dev string) {
-	NMRunCommand(fmt.Sprintf("device set %s  managed no", dev))
+	NMRunCommand(fmt.Sprintf("device set %s managed no", dev))
 }
 
 func NMEnableDev(dev string) {
