@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sonnt85/gosutils/cmdshellwords"
 	"github.com/sonnt85/gosutils/gogrep"
 	"github.com/sonnt85/gosutils/sexec"
-	"github.com/sonnt85/gosutils/shellwords"
 	"github.com/sonnt85/gosutils/sregexp"
 	"github.com/sonnt85/gosutils/sutils"
 	"github.com/sonnt85/gosystem"
@@ -83,7 +83,7 @@ func MMRunCommand(cmd string, timeouts ...time.Duration) (stdout string, err err
 		return "", fmt.Errorf("Cannot found gsm")
 	}
 	if !strings.Contains(cmd, "--command=") {
-		//		cmd = shellwords.Join(cmd)
+		//		cmd = cmdshellwords.Join(cmd)
 	}
 	mmtimeoutsecs := int(timeout / time.Second)
 	cmd = fmt.Sprintf(`mmcli --timeout %d -m %s %s`, mmtimeoutsecs, index, cmd)
@@ -98,8 +98,8 @@ func MMRunCommand(cmd string, timeouts ...time.Duration) (stdout string, err err
 }
 
 func MMSendAtCommand(cmd string, timeouts ...time.Duration) (stdout string, err error) {
-	//	return MMRunCommand(fmt.Sprintf(`--command=%s`, shellwords.Join(cmd)))
-	cmd = fmt.Sprintf(`--command=%s`, shellwords.Join(cmd))
+	//	return MMRunCommand(fmt.Sprintf(`--command=%s`, cmdshellwords.Join(cmd)))
+	cmd = fmt.Sprintf(`--command=%s`, cmdshellwords.Join(cmd))
 	//	log.Info("ATcommand to send: ", cmd)
 
 	stdout, err = MMRunCommand(cmd, timeouts...)
@@ -189,7 +189,7 @@ func NMRunCommand(cmd string, timeouts ...time.Duration) (stdout string, err err
 	}
 	nmtimeoutsecs := int(timeout / time.Second)
 
-	//	cmd = shellwords.Join(cmd)
+	//	cmd = cmdshellwords.Join(cmd)
 	cmd = fmt.Sprintf(`nmcli -w %d %s`, nmtimeoutsecs, cmd)
 	//	log.Info("nmcli comman: ", cmd)
 	stdoutb, stderrb, err1 := sexec.ExecCommandShell(cmd, timeout)
