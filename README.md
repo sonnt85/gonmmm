@@ -113,6 +113,10 @@ func main() {
 - `MMGetNetworkSignalStrength() string` — get signal quality percentage
 - `MMResetGSM() (string, error)` — reset the modem
 
+## Author
+
+**sonnt85** — [thanhson.rf@gmail.com](mailto:thanhson.rf@gmail.com)
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
