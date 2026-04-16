@@ -1,5 +1,7 @@
 # gonmmm
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/sonnt85/gonmmm.svg)](https://pkg.go.dev/github.com/sonnt85/gonmmm)
+
 A Go interface for NetworkManager (`nmcli`) and ModemManager (`mmcli`) — manage network connections and GSM/LTE modems on Linux.
 
 ## Installation
@@ -84,6 +86,7 @@ func main() {
 - `NMDisableCon(conname string) error` — bring a connection down
 - `NMRestartCon(conname string) error` — restart a connection
 - `NMConGetField(conname, field string) string` — get a connection field value
+- `NMConFieldIsMatch(conname, field, compareValue string) bool` — return true if the connection field equals the given value
 - `NMConModField(conname, field, newval string, others ...string) error` — modify a connection field
 - `NMConEditFieldIfChange(conname, field, newValue string) bool` — modify field only if value changed
 - `NMCreateConnection(conname, ifacename, contype string, others ...string) error` — create a connection
@@ -94,6 +97,9 @@ func main() {
 - `NMGetDevices() ([]string, error)` — list all network devices
 - `NMGetInterfacesActivatedSortByType(types []string) ([]string, error)` — list active interfaces sorted by type priority
 - `NMDevGetCon(ifacename string) string` — get the active connection name for a device
+- `NMDeviceIsExist(conname string) bool` — check whether the network device associated with a connection currently exists
+- `NMUpCon(conname string) error` — bring a connection up (alias for `NMEnableCon`)
+- `NMDelConIfDeviceIsNotExist(conname string) bool` — delete the connection if its associated network device is no longer present
 - `NMEnableDev/NMDisableDev(dev string)` — set device managed/unmanaged
 - `NMReloadConfig()` — reload NetworkManager configuration
 - `NMRestartMM()` — restart ModemManager service
