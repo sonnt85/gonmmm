@@ -33,10 +33,15 @@ func NMConIsExist(conname string) bool {
 	return err == nil
 }
 
-func NMCheckConIsExis(conname string) error {
+func NMCheckConIsExist(conname string) error {
 	cmd := fmt.Sprintf(`-g connection.id con show %s`, conname)
 	_, err := NMRunCommand(cmd)
 	return err
+}
+
+// Deprecated: Use NMCheckConIsExist instead.
+func NMCheckConIsExis(conname string) error {
+	return NMCheckConIsExist(conname)
 }
 
 func NMCleanupDuplicateCons(conname string) bool {
@@ -492,7 +497,7 @@ func NMGetDevices() (devices []string, err error) {
 	return devices, err
 }
 
-func NMGetInterfacesActivedSortByType(types []string) (interfaces []string, err error) {
+func NMGetInterfacesActivatedSortByType(types []string) (interfaces []string, err error) {
 	var devices []string
 	if devices1, err1 := NMRunCommand("-s -g DEVICE,TYPE con show -a"); err1 == nil {
 		devices = strings.Split(devices1, "\n")
@@ -530,7 +535,12 @@ func NMGetInterfacesActivedSortByType(types []string) (interfaces []string, err 
 	return interfaces, err
 }
 
-func NMDeviceIsexist(conname string) bool {
+// Deprecated: Use NMGetInterfacesActivatedSortByType instead.
+func NMGetInterfacesActivedSortByType(types []string) ([]string, error) {
+	return NMGetInterfacesActivatedSortByType(types)
+}
+
+func NMDeviceIsExist(conname string) bool {
 	if devices, err := NMGetDevices(); err == nil {
 		iname := NMConGetField(conname, "connection.interface-name")
 		if len(iname) != 0 {
@@ -545,7 +555,12 @@ func NMDeviceIsexist(conname string) bool {
 	return false
 }
 
-func NMDelConIfDeviceIsNotexist(conname string) (ret bool) {
+// Deprecated: Use NMDeviceIsExist instead.
+func NMDeviceIsexist(conname string) bool {
+	return NMDeviceIsExist(conname)
+}
+
+func NMDelConIfDeviceIsNotExist(conname string) (ret bool) {
 	if devices, err := NMGetDevices(); err == nil {
 		iname := NMConGetField(conname, "connection.interface-name")
 		if len(iname) != 0 {
@@ -559,6 +574,11 @@ func NMDelConIfDeviceIsNotexist(conname string) (ret bool) {
 		}
 	}
 	return false
+}
+
+// Deprecated: Use NMDelConIfDeviceIsNotExist instead.
+func NMDelConIfDeviceIsNotexist(conname string) bool {
+	return NMDelConIfDeviceIsNotExist(conname)
 }
 
 func NMReloadConfig() {
